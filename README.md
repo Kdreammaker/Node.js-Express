@@ -1,6 +1,9 @@
-# 티켓 예매 시스템 — Node.js 최종 과제
+# TICKETFLOW — 공연 예매 서비스
 
-DB 과제에서 설계한 `ticket_db`를 바탕으로 Express + Sequelize REST API 서버를 완성하세요.
+React + Express + Sequelize로 구축한 풀스택 공연 예매 서비스입니다.  
+공연 목록 조회, 좌석 선택, 예매·취소, 관리자 패널 기능을 제공합니다.
+
+> **Node.js 최종 과제** — DB 과제에서 설계한 `ticket_db`를 바탕으로 REST API 서버를 완성하세요.
 
 ## 서비스 구조
 
@@ -55,22 +58,24 @@ INSERT INTO performances VALUES (3, '2026 AI 아트 & 재즈 페스티벌',   '2
 -- seats 데이터도 DB 과제의 내용 그대로
 ```
 
-### 2. 서버 설정
+### 2. 서버 환경 변수 설정
 
 ```bash
-cd server
-cp .env.example .env        # DB_PASSWORD를 본인 비밀번호로 수정
-npm install
-npm run dev                 # 서버 기동 + users/bookings 테이블 자동 생성 + 시드
+cp server/.env.example server/.env
+# server/.env 열어서 DB_PASSWORD를 본인 비밀번호로 수정
 ```
 
-### 3. 클라이언트 실행 (새 터미널)
+### 3. 패키지 설치 및 실행
 
 ```bash
-cd client
-npm install
-npm run dev                 # http://localhost:5173
+npm install      # 루트에서 한 번만 — 서버·클라이언트 동시 설치
+npm run dev      # 서버(3001) + 클라이언트(5173) 동시 실행
 ```
+
+| | URL |
+|---|---|
+| 클라이언트 | http://localhost:5173 |
+| 서버 | http://localhost:3001 |
 
 ---
 
