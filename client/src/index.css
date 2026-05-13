@@ -1,0 +1,28 @@
+@import "tailwindcss";
+
+@theme {
+  --color-canvas:        #0d0d1a;
+  --color-surface:       #16162a;
+  --color-surface2:      #1e1e36;
+  --color-panel:         #2a2a4a;
+  --color-brand:         #7c3aed;
+  --color-brand-light:   #a855f7;
+  --color-danger:        #f43f5e;
+  --color-danger-light:  #fb7185;
+  --color-foreground:    #f0f0f8;
+  --color-subtle:        #8888aa;
+}
+
+@keyframes modal-pop {
+  from { transform: scale(.82); opacity: 0; }
+  to   { transform: scale(1);   opacity: 1; }
+}
+
+@layer base {
+  body {
+    @apply bg-canvas text-foreground antialiased min-h-screen;
+    font-family: 'Noto Sans KR', 'Apple SD Gothic Neo', sans-serif;
+  }
+  button { cursor: pointer; font-family: inherit; }
+  a { color: inherit; text-decoration: none; }
+}
