@@ -1,4 +1,5 @@
-# TICKETFLOW — 공연 예매 서비스
+# Node.js/Express최종과제
+TICKETFLOW — 공연 예매 서비스
 
 React + Express + Sequelize로 구축한 풀스택 공연 예매 서비스입니다.  
 공연 목록 조회, 좌석 선택, 예매·취소, 관리자 패널 기능을 제공합니다.
