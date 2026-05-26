@@ -35,12 +35,12 @@ export async function getUserBookings(userId: string) {
     //    Booking → Seat (as: 'seat')
     //    Booking → Performance (as: 'performance')
     include: [
-      /* ??? */,
-      /* ??? */,
+      { model: Seat, as: 'seat' },
+      { model: Performance, as: 'performance' },
     ],
 
     // 💡 [과제 5-2] booked_at 기준 내림차순(최신순)으로 정렬하세요.
-    order: /* ??? */,
+    order: [['booked_at', 'DESC']],
   });
 
   return bookings.map((b) => {

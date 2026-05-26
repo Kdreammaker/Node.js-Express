@@ -30,11 +30,11 @@ export async function listPerformances() {
 
     // 💡 [과제 1-1] Seat 모델을 함께 가져오도록 include 옵션을 작성하세요.
     //    힌트: models/index.ts에서 as 별칭을 확인하세요. ('seats')
-    include: /* ??? */,
+    include: [{ model: Seat, as: 'seats' }],
 
     // 💡 [과제 1-2] pf_id 기준 오름차순으로 정렬하세요.
     //    힌트: order: [['컬럼명', 'ASC'|'DESC']]
-    order: /* ??? */,
+    order: [['pf_id', 'ASC']],
   });
 
   // 💡 [과제 1-3] 아래 형태로 직렬화해서 반환하세요.
@@ -43,13 +43,13 @@ export async function listPerformances() {
   return performances.map((p) => {
     const seats = (p as any).seats as Seat[];
     return {
-      pf_id: /* ??? */,
-      title: /* ??? */,
-      start_at: /* ??? */,
-      price: /* ??? */,
+      pf_id: p.pf_id,
+      title: p.title,
+      start_at: p.start_at,
+      price: p.price,
       seats,
-      available_count: /* ??? */,
-      total_count: /* ??? */,
+      available_count: seats.filter((s) => s.is_available).length,
+      total_count: seats.length,
     };
   });
 }
@@ -59,18 +59,19 @@ export async function listPerformances() {
 //    GET /performances/:id
 //    특정 공연 1개 + 좌석 목록을 반환합니다. 없으면 404 에러.
 // ══════════════════════════════════════════════════════════
+// ══════════════════════════════════════════════════════════
 export async function getPerformance(id: number) {
   const performance = await Performance.findOne({
 
     // 💡 [과제 2-1] pf_id가 id인 공연을 찾는 where 조건을 작성하세요.
     //    좌석 목록도 함께 가져와야 합니다.
-    where: /* ??? */,
-    include: /* ??? */,
+    where: { pf_id: id },
+    include: [{ model: Seat, as: 'seats' }],
   });
 
   // 💡 [과제 2-2] 공연이 없을 때 404 에러를 던지세요.
   //    힌트: notFound() 함수가 이미 파일 상단에 정의되어 있습니다.
-  if (/* ??? */) throw notFound('공연을 찾을 수 없습니다.');
+  if (!performance) throw notFound('공연을 찾을 수 없습니다.');
 
   const seats = (performance as any).seats as Seat[];
   return {

@@ -39,20 +39,20 @@ export async function createBooking({ userId, seatId }: { userId: string; seatId
 
   // 💡 [과제 3-1] sequelize.transaction()으로 트랜잭션을 시작하세요.
   //    콜백(t)에서 에러가 나면 자동 rollback, 정상이면 자동 commit입니다.
-  return /* ??? */.transaction(async (t) => {
+  return sequelize.transaction(async (t) => {
 
     // 💡 [과제 3-2] seat_id가 seatId인 좌석을 조회하세요.
     //    - 비관적 락(lock: true)을 걸어 동시 예약을 막아야 합니다.
     //    - 반드시 transaction: t 를 전달해야 합니다.
     const seat = await Seat.findOne({
-      where: /* ??? */,
-      lock: /* ??? */,
-      transaction: /* ??? */,
+      where: { seat_id: seatId },
+      lock: true,
+      transaction: t,
     });
 
     // 💡 [과제 3-3] 좌석이 없거나 이미 예약된 경우 에러를 던지세요.
     //    throw되면 트랜잭션이 자동 롤백됩니다.
-    if (/* ??? */) {
+    if (!seat || !seat.is_available) {
       throw badRequest('이미 예약되었거나 존재하지 않는 좌석입니다.');
     }
 
@@ -60,14 +60,20 @@ export async function createBooking({ userId, seatId }: { userId: string; seatId
     //    필요한 필드: user_id, seat_id, pf_id, status: 'confirmed'
     //    반드시 { transaction: t } 를 두 번째 인자로 전달하세요.
     const booking = await Booking.create(
-      { /* ??? */ },
+      {
+        user_id: userId,
+        seat_id: seatId,
+        pf_id: seat.pf_id,
+        status: 'confirmed'
+      },
       { transaction: t }
     );
 
     // 💡 [과제 3-5] 좌석 상태를 예약 불가로 바꾸고 저장하세요.
     //    seat.is_available = ???
     //    await seat.save({ transaction: ??? })
-    /* ??? */
+    seat.is_available = false;
+    await seat.save({ transaction: t });
 
     return { success: true, booking_id: booking.booking_id, message: '예약 완료' };
   });
@@ -83,8 +89,8 @@ export async function cancelBooking(bookingId: number, userId: string) {
   //    좌석 상태를 되돌려야 하므로 Seat 모델도 include 해야 합니다.
   //    (as 별칭: 'seat')
   const booking = await Booking.findOne({
-    where: /* ??? */,
-    include: /* ??? */,
+    where: { booking_id: bookingId },
+    include: [{ model: Seat, as: 'seat' }],
   });
 
   if (!booking) throw notFound('예약을 찾을 수 없습니다.');
@@ -92,7 +98,7 @@ export async function cancelBooking(bookingId: number, userId: string) {
   // 💡 [과제 4-2] 본인 예약인지 확인하세요.
   //    booking.user_id와 요청으로 받은 userId를 비교합니다.
   //    힌트: forbidden() 함수가 파일 상단에 정의되어 있습니다.
-  if (/* ??? */) throw forbidden('본인 예약만 취소할 수 있습니다.');
+  if (booking.user_id !== userId) throw forbidden('본인 예약만 취소할 수 있습니다.');
 
   if (booking.status === 'cancelled') throw badRequest('이미 취소된 예약입니다.');
 
@@ -100,7 +106,14 @@ export async function cancelBooking(bookingId: number, userId: string) {
   //    1) booking.status = 'cancelled' 후 save
   //    2) 연결된 좌석(seat)의 is_available = true 후 save
   return sequelize.transaction(async (t) => {
-    /* ??? */
+    booking.status = 'cancelled';
+    await booking.save({ transaction: t });
+
+    const seat = (booking as any).seat as Seat;
+    if (seat) {
+      seat.is_available = true;
+      await seat.save({ transaction: t });
+    }
 
     return { success: true, message: '예약이 취소되었습니다.' };
   });
