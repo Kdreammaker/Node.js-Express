@@ -21,3 +21,6 @@ npm-debug.log*
 
 # TypeScript 증분 빌드 캐시
 *.tsbuildinfo
+
+# 스크린샷 캡처본 (로컬 드라이브에만 보관)
+snapshot/
